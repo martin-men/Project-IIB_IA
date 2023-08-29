@@ -22,6 +22,7 @@ def predictWindow():
         predictWindow.resizable(0, 0)
         predictWindow.config(bg='lightblue')
         predictWindow.protocol("WM_DELETE_WINDOW", lambda: on_closing(predictWindow))
+        predictWindow.iconbitmap('Images/appWindowIcon.ico')
         
         # CREACION DE ELEMENTOS - VENTANA PREDICCIONES
         #   Imagen logo de la aplicacion
@@ -29,14 +30,14 @@ def predictWindow():
         appLabel_pred.place(x=300, y=30, anchor='n')
         
         #   Texto de instrucciones de la ventana
-        instText = Label(predictWindow, text='Seleccione el archivo de datos a predecir', font=('Javanese Text', 11), bg='lightblue')
+        instText = Label(predictWindow, text='Seleccione el archivo .csv de registros a predecir', font=('Javanese Text', 11), bg='lightblue')
         instText.place(x=300, y=115, anchor='n')
         
         #   Etiqueta con el nombre del archivo seleccionado
         fileNameLabel = Label(predictWindow, font=('Javanese Text', 9), bg='#D1FFBD')
         
         #   Boton para iniciar la prediccion
-        predictBtn = Button(predictWindow, text='Predecir', font=('Javanese Text', 9, 'bold'), bg='green', fg='white', width=10, height=1, bd=4)
+        predictBtn = Button(predictWindow, text='Predecir registros', font=('Javanese Text', 9, 'bold'), bg='green', fg='white', width=15, height=1, bd=4)
         
         #   Boton para seleccionar el archivo de datos
         openFileBtn = Button(predictWindow, text='Abrir', font=('Javanese Text', 9, 'bold'), bg='darkblue', fg='white', width=10, height=1, bd=4, command=lambda: openFile(fileNameLabel, predictBtn))
@@ -45,7 +46,7 @@ def predictWindow():
 
 #   Confirmacion de cierre de ventana
 def on_closing(window):
-    if messagebox.askokcancel("salir", "¿Desea salir de la ventana actual?"):
+    if messagebox.askokcancel("Salir", "¿Desea salir de la ventana actual?"):
         if window.title() != 'ReVin':
             root.deiconify()
         window.destroy()
@@ -95,6 +96,7 @@ root.geometry('600x300')
 root.resizable(0, 0)
 root.config(bg='lightblue')
 root.protocol("WM_DELETE_WINDOW", lambda: on_closing(root))
+root.iconbitmap('Images/appWindowIcon.ico')
 
 #   Imagen del escudo del Ecuador
 ecImage = ImageTk.PhotoImage(file='Images/Ecuador.png')
