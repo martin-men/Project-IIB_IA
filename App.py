@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import filedialog
+from tkinter import Tk, Label, Button, Frame,  messagebox, filedialog, ttk, Scrollbar, VERTICAL, HORIZONTAL
 from PIL import ImageTk
 
 # VARIABLES GLOBALES
@@ -37,12 +38,123 @@ def predictWindow():
         fileNameLabel = Label(predictWindow, font=('Javanese Text', 9), bg='#D1FFBD')
         
         #   Boton para iniciar la prediccion
-        predictBtn = Button(predictWindow, text='Predecir registros', font=('Javanese Text', 9, 'bold'), bg='green', fg='white', width=15, height=1, bd=4)
+        predictBtn = Button(predictWindow, text='Predecir registros', font=('Javanese Text', 9, 'bold'), bg='green', fg='white', width=15, height=1, bd=4, command=resWindow)
         
         #   Boton para seleccionar el archivo de datos
         openFileBtn = Button(predictWindow, text='Abrir', font=('Javanese Text', 9, 'bold'), bg='darkblue', fg='white', width=10, height=1, bd=4, command=lambda: openFile(fileNameLabel, predictBtn))
         openFileBtn.place(x=200, y=160, anchor='n')
         
+#   Ventana de Resultados
+def resWindow():
+    global resWindow
+
+    try:
+        if resWindow.state() == 'normal': resWindow.focus()
+    except:
+        root.iconify()
+        resWindow = Toplevel(root)
+        resWindow.title('ReVin - Resultados')
+        resWindow.geometry('600x400')
+        resWindow.config(bg='black')
+        resWindow.protocol("WM_DELETE_WINDOW", lambda: on_closing(resWindow))
+        resWindow.iconbitmap('Images/appWindowIcon.ico')
+        
+        # CREACION DE ELEMENTOS - VENTANA RESULTADOS
+        # CONFIGURACIONES
+        resWindow.columnconfigure(0, weight = 25)
+        resWindow.rowconfigure(0, weight= 25)
+        resWindow.columnconfigure(0, weight = 1)
+        resWindow.rowconfigure(1, weight= 1)
+        
+        # ELEMENTOS
+        frame1 = Frame(resWindow, bg='gray26')
+        frame1.grid(column=0,row=0,sticky='nsew')
+        frame2 = Frame(resWindow, bg='gray26')
+        frame2.grid(column=0,row=1,sticky='nsew')
+        
+        frame1.columnconfigure(0, weight = 1)
+        frame1.rowconfigure(0, weight= 1)
+        
+        frame2.columnconfigure(0, weight = 1)
+        frame2.rowconfigure(0, weight= 1)
+        frame2.columnconfigure(1, weight = 1)
+        frame2.rowconfigure(0, weight= 1)
+        
+        frame2.columnconfigure(2, weight = 1)
+        frame2.rowconfigure(0, weight= 1)
+        
+        frame2.columnconfigure(3, weight = 2)
+        frame2.rowconfigure(0, weight= 1)
+        tabla = ttk.Treeview(frame1 , height=10)
+        tabla.grid(column=0, row=0, sticky='nsew')
+        
+        ladox = Scrollbar(frame1, orient = HORIZONTAL, command= tabla.xview)
+        ladox.grid(column=0, row = 1, sticky='ew') 
+        
+        ladoy = Scrollbar(frame1, orient =VERTICAL, command = tabla.yview)
+        ladoy.grid(column = 1, row = 0, sticky='ns')
+        
+        tabla.configure(xscrollcommand = ladox.set, yscrollcommand = ladoy.set)
+        
+        estilo = ttk.Style(frame1)
+        estilo.theme_use('clam') #  ('clam', 'alt', 'default', 'classic')
+        estilo.configure(".",font= ('Arial', 14), foreground='red2')
+        estilo.configure("Treeview", font= ('Helvetica', 12), foreground='black',  background='white')
+        estilo.map('Treeview',background=[('selected', 'green2')], foreground=[('selected','black')] )
+        
+        
+        boton1 = Button(frame2, text= 'Abrir', bg='green2', command= abrir_archivo)
+        boton1.grid(column = 0, row = 0, sticky='nsew', padx=10, pady=10)
+        
+        boton2 = Button(frame2, text= 'Mostrar', bg='magenta', command= datos_excel)
+        boton2.grid(column = 1, row = 0, sticky='nsew', padx=10, pady=10)
+        
+        boton3 = Button(frame2, text= 'Limpiar', bg='red', command= Limpiar)
+        boton3.grid(column = 2, row = 0, sticky='nsew', padx=10, pady=10)
+        
+        
+        indica = Label(frame2, fg= 'white', bg='gray26', text= 'Ubicación del archivo', font= ('Arial',10,'bold') )
+        indica.grid(column=3, row = 0)
+
+def abrir_archivo():
+	
+    # archivo = archivo de predicciones
+
+	indica['text'] = archivo
+
+def datos_excel():
+
+	datos_obtenidos = indica['text']
+	try:
+		archivoexcel = r'{}'.format(datos_obtenidos)
+		
+
+		df = pd.read_excel(archivoexcel)
+
+	except ValueError:
+		messagebox.showerror('Informacion', 'Formato incorrecto')
+		return None
+
+	except FileNotFoundError:
+		messagebox.showerror('Informacion', 'El archivo esta \n malogrado')
+		return None
+
+	Limpiar()
+
+	tabla['column'] = list(df.columns)
+	tabla['show'] = "headings"  #encabezado
+     
+
+	for columna in tabla['column']:
+		tabla.heading(columna, text= columna)
+	
+
+	df_fila = df.to_numpy().tolist()
+	for fila in df_fila:
+		tabla.insert('', 'end', values =fila)
+
+def Limpiar():
+	tabla.delete(*tabla.get_children())
 
 #   Confirmacion de cierre de ventana
 def on_closing(window):
