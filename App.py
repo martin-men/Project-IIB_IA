@@ -6,6 +6,7 @@ from tkinter import filedialog
 from tkinter import Tk, Label, Button, Frame,  messagebox, filedialog, ttk, Scrollbar, VERTICAL, HORIZONTAL
 from PIL import ImageTk
 import pandas as pd
+from predict import doPredict
 
 # VARIABLES GLOBALES
 csvFile = ''
@@ -90,10 +91,10 @@ def resWindow():
         frame2.rowconfigure(0, weight= 1)
 
         def abrir_archivo():
-            #archivo = '/predicted.csv'
-            archivo = filedialog.askopenfilename(initialdir ='/', 
-											title='Selecione archivo', 
-											filetype=((' files', '*.csv*'),('All files', '*.*')))
+            archivo = './predicted.csv'
+            # archivo = filedialog.askopenfilename(initialdir ='/', 
+			# 								title='Selecione archivo', 
+			# 								filetype=((' files', '*.csv*'),('All files', '*.*')))
             indica['text'] = archivo
 
         def datos_excel():
@@ -166,17 +167,6 @@ def on_closing(window):
             root.deiconify()
         window.destroy()
 
-#   Verificar archivo seleccionado
-def checkFile():
-    global csvFile
-    if csvFile == '':
-        messagebox.showerror('Error', 'No se ha seleccionado un archivo de datos')
-        return FALSE
-    elif csvFile[-3:] != 'csv':
-        messagebox.showerror('Error', 'El archivo seleccionado no es un archivo .csv')
-        return FALSE
-    return TRUE
-
 #   Obtener el nombre del archivo seleccionado
 def getFileName():
     global csvFile
@@ -197,11 +187,14 @@ def openFile(label, predictBtn):
         label.place_forget()
     except:
         pass
-    csvFile = filedialog.askopenfilename()
-    if checkFile():        
-        label.config(text=getFileName())
-        label.place(x = 400, y = 170, anchor='n')
-        predictBtn.place(x=300, y=230, anchor='n')
+    csvFile = filedialog.askopenfilename(filetypes=[('CSV Files', '*.csv')])
+    data_to_predict = pd.read_csv(csvFile, sep=';')
+      
+    label.config(text=getFileName())
+    label.place(x = 400, y = 170, anchor='n')
+    predictBtn.place(x=300, y=230, anchor='n')
+
+    doPredict(data_to_predict)
 
 # CREACION DE ELEMENTOS - VENTANA PRINCIPAL
 #   Ventana principal
